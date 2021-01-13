@@ -17,7 +17,8 @@ layout(std430, binding=0) buffer myBuffer {
 
 void cool_main() {
     uint gid = gl_GlobalInvocationID.x;
-    data[gid].r = min(255, int(data[gid].r * 0.393 + data[gid].g * 0.769 + data[gid].b * 0.189));
-    data[gid].g = min(255, int(data[gid].r * 0.349 + data[gid].g * 0.686 + data[gid].b * 0.168));
-    data[gid].b = min(255, int(data[gid].r * 0.272 + data[gid].g * 0.534 + data[gid].b * 0.131));
+    rgba col = data[gid];
+    data[gid].r = min(255, int(col.r * 0.393 + col.g * 0.769 + col.b * 0.189));
+    data[gid].g = min(255, int(col.r * 0.349 + col.g * 0.686 + col.b * 0.168));
+    data[gid].b = min(255, int(col.r * 0.272 + col.g * 0.534 + col.b * 0.131));
 }
