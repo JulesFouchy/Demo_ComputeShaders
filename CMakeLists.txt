@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 # Set project name
-project(CoolComputeShaders C CXX)
+project(GPGPU C CXX)
 
 # Set C++ version
 set(CXX_STANDARD 17)
@@ -12,6 +12,7 @@ set(COOL_MODULES
     App
     OpenGL
     File
+    Random
 )
 
 # Set the path where all the Cool modules are stored. It is required by all the Cool IncludeMe.cmake files

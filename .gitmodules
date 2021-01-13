@@ -13,3 +13,6 @@
 [submodule "Cool/File"]
 	path = Cool/File
 	url = https://github.com/CoolOpenGL/File
+[submodule "Cool/Random"]
+	path = Cool/Random
+	url = https://github.com/CoolOpenGL/Random

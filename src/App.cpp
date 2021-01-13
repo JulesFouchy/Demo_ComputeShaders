@@ -3,36 +3,53 @@
 #include <Cool/App/RenderState.h>
 #include <Cool/App/Input.h>
 
+#include <Cool/Random/Random.h>
 #include <Cool/OpenGL/SSBO.h>
 #include <Cool/OpenGL/ComputeShader.h>
 #include <iostream>
 
-App::App()
-{
-	constexpr int N = 150;
-	// CPU create data
+std::vector<float> createRandomVector(int N) {
 	std::vector<float> v;
 	for (int i = 0; i < N; ++i) {
-		v.push_back(i);
+		v.push_back(Random::getMinus1to1() * 100.f);
 	}
-	std::cout << "in  : ";
-	for (auto x : v) {
+	return v;
+}
+
+template<typename T>
+void printVector(const std::vector<T>& v) {
+	for (auto& x : v) {
 		std::cout << x << " ";
 	}
 	std::cout << std::endl;
+}
+
+void td1_ex2() {
+	constexpr int N = 10;
+	// CPU create data
+	std::vector<float> v1 = createRandomVector(N);
+	std::vector<float> v2 = createRandomVector(N);
+	std::cout << "in1  : ";
+	printVector(v1);
+	std::cout << "in2  : ";
+	printVector(v2);
 	// GPU upload data
-	SSBO<float> ssbo(0);
-	ssbo.uploadData(v);
+	SSBO<float> ssbo1(0);
+	ssbo1.uploadData(v1);
+	SSBO<float> ssbo2(1);
+	ssbo2.uploadData(v2);
 	// GPU compute
-	ComputeShader<256, 1, 1> computeShader("shaders/squareNumbers.comp");
+	ComputeShader<256, 1, 1> computeShader("shaders/td1_ex2.comp");
 	computeShader.compute(N);
 	// CPU get data back
-	ssbo.downloadData(v);
+	ssbo1.downloadData(v1);
 	std::cout << "out : ";
-	for (auto x : v) {
-		std::cout << x << " ";
-	}
-	std::cout << std::endl;
+	printVector(v1);
+}
+
+App::App()
+{
+	td1_ex2();
 }
 
 void App::update() {
