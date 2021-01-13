@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Cool/App/IApp.h>
+#include <Cool/Renderer_Fullscreen/Renderer_Fullscreen.h>
 
 using namespace Cool;
 
@@ -13,6 +14,12 @@ public:
 	void ImGuiWindows() override;
 	void ImGuiMenus() override;
 	void onEvent(const SDL_Event & e) override;
+
+private:
+	void td1_ex3_withFragmentShader();
+
+private:
+	Renderer_Fullscreen m_renderer;
 
 private:
 #ifndef NDEBUG

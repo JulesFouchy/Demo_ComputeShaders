@@ -8,6 +8,9 @@
 #include <Cool/OpenGL/ComputeShader.h>
 #include <Cool/LoadImage/LoadImage.h>
 #include <Cool/ExportImage/AsPNG.h>
+#include <Cool/OpenGL/Texture.h>
+#include <Cool/OpenGL/TextureFB.h>
+#include <Cool/OpenGL/Shader.h>
 #include <iostream>
 
 std::vector<float> createRandomVector(int N) {
@@ -24,6 +27,18 @@ void printVector(const std::vector<T>& v) {
 		std::cout << x << " ";
 	}
 	std::cout << std::endl;
+}
+
+void exportFramebuffer(FrameBuffer& frameBuffer, const char* filepath) {
+	frameBuffer.bind();
+	RectSize size = RenderState::Size();
+	unsigned char* data = new unsigned char[4 * size.width() * size.height()];
+	glReadPixels(0, 0, size.width(), size.height(), GL_RGBA, GL_UNSIGNED_BYTE, data);
+	frameBuffer.unbind();
+	// Write png
+	ExportImage::AsPNG(filepath, size.width(), size.height(), data);
+	//
+	delete[] data;
 }
 
 void td1_ex2() {
@@ -73,10 +88,36 @@ void td1_ex3() {
 	LoadImage::Free(imageData);
 }
 
+void App::td1_ex3_withFragmentShader() {
+	// Load image in a Texture
+	Texture imageTexture;
+	imageTexture.genTexture();
+	int w, h;
+	unsigned char* data = LoadImage::Load("img/mc.jpg", &w, &h);
+	imageTexture.uploadRGBA(w, h, data);
+	LoadImage::Free(data);
+	RenderState::setExportSize(w, h);
+	RenderState::setIsExporting(true);
+	// Apply shader
+	Shader shader({
+		ShaderCode(ShaderType::Vertex, "Cool/Renderer_Fullscreen/fullscreen.vert"),
+		ShaderCode(ShaderType::Fragment, "shaders/td1_ex3.frag")
+	});
+	m_renderer.begin();
+	{
+		shader.bind();
+		imageTexture.bindToSlot(0);
+		m_renderer.render();
+	}
+	exportFramebuffer(m_renderer.renderBuffer(), "img/mcout2.jpg");
+	RenderState::setIsExporting(false);
+}
+
 App::App()
 {
 	td1_ex2();
 	td1_ex3();
+	td1_ex3_withFragmentShader();
 }
 
 void App::update() {
@@ -93,11 +134,6 @@ void App::ImGuiWindows() {
 	if (m_bShow_ImGuiDemo) // Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 		ImGui::ShowDemoWindow(&m_bShow_ImGuiDemo);
 #endif
-	ImGui::Begin("TD1 Ex3");
-	if (ImGui::Button("Recompute image")) {
-		td1_ex3();
-	}
-	ImGui::End();
 }
 
 void App::ImGuiMenus() {
