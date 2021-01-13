@@ -13,6 +13,8 @@ set(COOL_MODULES
     OpenGL
     File
     Random
+    LoadImage
+    ExportImage
 )
 
 # Set the path where all the Cool modules are stored. It is required by all the Cool IncludeMe.cmake files
@@ -51,6 +53,7 @@ VS_RegisterFiles("${MY_SHADERS}")
 # Add a post build operation to copy shaders to the output folder (where the executable is created)
 include("${PATH_TO_COOL}/CMake-Helpers/copy_folder_to_the_output_folder.cmake")
 copy_folder_to_the_output_folder("shaders")
+copy_folder_to_the_output_folder("img")
 
 # Set include directories
 include_directories(

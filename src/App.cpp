@@ -6,6 +6,8 @@
 #include <Cool/Random/Random.h>
 #include <Cool/OpenGL/SSBO.h>
 #include <Cool/OpenGL/ComputeShader.h>
+#include <Cool/LoadImage/LoadImage.h>
+#include <Cool/ExportImage/AsPNG.h>
 #include <iostream>
 
 std::vector<float> createRandomVector(int N) {
@@ -39,7 +41,7 @@ void td1_ex2() {
 	SSBO<float> ssbo2(1);
 	ssbo2.uploadData(v2);
 	// GPU compute
-	ComputeShader<256, 1, 1> computeShader("shaders/td1_ex2.comp");
+	ComputeShader computeShader("shaders/td1_ex2.comp");
 	computeShader.compute(N);
 	// CPU get data back
 	ssbo1.downloadData(v1);
@@ -47,9 +49,34 @@ void td1_ex2() {
 	printVector(v1);
 }
 
+void td1_ex3() {
+	// CPU get image data
+	int w, h;
+	unsigned char* imageData = LoadImage::Load("img/mc.jpg", &w, &h);
+	const int N = w * h * 4;
+	std::vector<int> v;
+	for (int i = 0; i < N; ++i) {
+		v.push_back(imageData[i]);
+	}
+	// GPU upload data
+	SSBO<int> ssbo(0);
+	ssbo.uploadData(v);
+	// GPU compute
+	ComputeShader computeShader("shaders/td1_ex3.comp");
+	computeShader.compute(N / 4);
+	// CPU get data back
+	ssbo.downloadData(v);
+	for (int i = 0; i < N; ++i) {
+		imageData[i] = v[i];
+	}
+	ExportImage::AsPNG("img/mcout.png", w, h, imageData);
+	LoadImage::Free(imageData);
+}
+
 App::App()
 {
 	td1_ex2();
+	td1_ex3();
 }
 
 void App::update() {
@@ -66,6 +93,11 @@ void App::ImGuiWindows() {
 	if (m_bShow_ImGuiDemo) // Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 		ImGui::ShowDemoWindow(&m_bShow_ImGuiDemo);
 #endif
+	ImGui::Begin("TD1 Ex3");
+	if (ImGui::Button("Recompute image")) {
+		td1_ex3();
+	}
+	ImGui::End();
 }
 
 void App::ImGuiMenus() {

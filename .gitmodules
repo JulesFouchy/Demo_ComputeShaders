@@ -16,3 +16,9 @@
 [submodule "Cool/Random"]
 	path = Cool/Random
 	url = https://github.com/CoolOpenGL/Random
+[submodule "Cool/LoadImage"]
+	path = Cool/LoadImage
+	url = https://github.com/CoolOpenGL/LoadImage
+[submodule "Cool/ExportImage"]
+	path = Cool/ExportImage
+	url = https://github.com/CoolOpenGL/ExportImage
